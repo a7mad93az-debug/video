@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Video</title>
 
   <style>
@@ -15,55 +15,60 @@
       overflow: hidden;
     }
 
-    /* Full-screen video */
+    /* يخلي الفيديو فل سكرين فعلي على الموبايل */
     #v {
       position: fixed;
-      inset: 0;           /* top:0 right:0 bottom:0 left:0 */
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover;  /* fill screen nicely */
+      object-fit: cover;
       background: #000;
+      z-index: 1;
     }
 
-    /* Optional: hint to tap for sound */
-    .hint {
+    /* رسالة صغيرة اختيارية بالوسط (بتختفي بعد أول لمسة) */
+    #hint {
       position: fixed;
-      left: 50%;
-      bottom: 24px;
-      transform: translateX(-50%);
-      color: white;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
       font-family: Arial, sans-serif;
-      font-size: 14px;
-      opacity: 0.75;
-      pointer-events: none;
+      font-size: 16px;
       text-align: center;
+      z-index: 2;
+      pointer-events: none;
+      opacity: .85;
     }
   </style>
 </head>
 
 <body>
-  <video id="v" autoplay muted loop playsinline>
+  <video id="v" autoplay muted loop playsinline preload="auto">
     <source src="M.mp4" type="video/mp4" />
   </video>
 
-  <div class="hint">اضغط على الشاشة لتشغيل الصوت</div>
+  <div id="hint">اضغط على الشاشة لتشغيل الصوت</div>
 
   <script>
     const v = document.getElementById("v");
+    const hint = document.getElementById("hint");
 
-    // Enable sound on user interaction (required on phones)
-    const enableSound = async () => {
+    async function enableSound() {
       try {
         v.muted = false;
         v.volume = 1.0;
         await v.play();
-      } catch (e) {}
-      document.removeEventListener("click", enableSound);
-      document.removeEventListener("touchstart", enableSound);
-    };
+        hint.style.display = "none";
+        document.removeEventListener("click", enableSound);
+        document.removeEventListener("touchstart", enableSound);
+      } catch (e) {
+        // إذا المتصفح رفض، خليه على محاولة ثانية
+      }
+    }
 
-    document.addEventListener("click", enableSound, { once: true });
-    document.addEventListener("touchstart", enableSound, { once: true });
+    document.addEventListener("click", enableSound, { once: false });
+    document.addEventListener("touchstart", enableSound, { once: false });
   </script>
 </body>
 </html>
