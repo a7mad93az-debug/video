@@ -1,15 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Video</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* Full-screen video */
+    #v {
+      position: fixed;
+      inset: 0;           /* top:0 right:0 bottom:0 left:0 */
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;  /* fill screen nicely */
+      background: #000;
+    }
+
+    /* Optional: hint to tap for sound */
+    .hint {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      opacity: 0.75;
+      pointer-events: none;
+      text-align: center;
+    }
+  </style>
+</head>
+
 <body>
+  <video id="v" autoplay muted loop playsinline>
+    <source src="M.mp4" type="video/mp4" />
+  </video>
 
-<video id="v" autoplay muted loop playsinline>
-  <source src="M.mp4" type="video/mp4">
-</video>
+  <div class="hint">اضغط على الشاشة لتشغيل الصوت</div>
 
-<script>
-  document.addEventListener("click", () => {
+  <script>
     const v = document.getElementById("v");
-    v.muted = false;
-    v.play();
-  });
-</script>
 
+    // Enable sound on user interaction (required on phones)
+    const enableSound = async () => {
+      try {
+        v.muted = false;
+        v.volume = 1.0;
+        await v.play();
+      } catch (e) {}
+      document.removeEventListener("click", enableSound);
+      document.removeEventListener("touchstart", enableSound);
+    };
+
+    document.addEventListener("click", enableSound, { once: true });
+    document.addEventListener("touchstart", enableSound, { once: true });
+  </script>
 </body>
+</html>
